@@ -1,9 +1,9 @@
-import Poems from "@/components/templates/Poems";
+import Main from "@/components/templates/Home/Main";
 
 export default function Home() {
   return (
     <>
-      <Poems />
+      <Main />
     </>
   );
 }
