@@ -1,12 +1,8 @@
 "use client";
 
 import Poem from "@/components/modules/Poem";
-import data from "@/data/data";
+import { poems as fullPoems } from "@/data/data";
 import React, { useEffect, useRef, useState } from "react";
-
-type FullPorts = {
-  [property in string]: { [property in number]: string[] };
-};
 
 function Main() {
   const searchInputRef = useRef<null | HTMLInputElement>(null);
@@ -17,23 +13,26 @@ function Main() {
     if (!search) {
       setPoems([]);
     } else {
-      let fullParts: FullPorts = {};
+      const specialWord = "[\u064E\u0650\u064F\u064B\u064C\u064D\u0652]";
+      const specialPattern = new RegExp(specialWord);
+      const isHasSpecialWord = specialPattern.test(search);
+      let searchPattern = new RegExp("");
 
-      for (const key in data) {
-        fullParts[key] = data[key].parts;
+      if (!isHasSpecialWord) {
+        const regex = search
+          .split("")
+          .reduce((prev, next) => `${prev}${next}${specialWord}?`, "");
+
+        searchPattern = new RegExp(regex);
       }
 
-      let fullPoems: string[] = [];
-
-      for (const key in fullParts) {
-        const part = { ...fullParts[key] };
-
-        for (const keyOfPart in part) {
-          fullPoems = [...fullPoems, ...part[keyOfPart]];
+      let activePoems = fullPoems.filter((poem) => {
+        if (isHasSpecialWord) {
+          return poem.includes(search);
         }
-      }
 
-      const activePoems = fullPoems.filter((poem) => poem.includes(search));
+        return poem.match(searchPattern);
+      });
 
       setPoems(activePoems);
     }
