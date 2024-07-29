@@ -8,12 +8,6 @@ type PoemProps = {
 function Poem({ search, text }: PoemProps) {
   let newText = text;
 
-  function replaceWord(regex: RegExp, text: string, isEmpty: boolean) {
-    return text.replace(regex, (word) =>
-      isEmpty ? "" : `<span class="active">${word}</span>`
-    );
-  }
-
   if (search) {
     const specialWord = "[\u064E\u0650\u064F\u064B\u064C\u064D\u0652]";
     const specialPattern = new RegExp(specialWord);
@@ -22,7 +16,7 @@ function Poem({ search, text }: PoemProps) {
       .split("")
       .reduce((prev, next) => `${prev}${next}${specialWord}?`, "");
 
-    const searchPattern = new RegExp(regex);
+    const searchPattern = new RegExp(regex, "g");
 
     if (isHasSpecialWord) {
       newText = text.replaceAll(
@@ -30,16 +24,10 @@ function Poem({ search, text }: PoemProps) {
         (word) => `<span class="active">${word}</span>`
       );
     } else {
-      let oldText = text;
-
-      while (true) {
-        newText = replaceWord(searchPattern, oldText, false);
-        oldText = replaceWord(searchPattern, oldText, true);
-
-        if (!searchPattern.test(oldText)) {
-          break;
-        }
-      }
+      newText = text.replaceAll(
+        searchPattern,
+        (word) => `<span class="active">${word}</span>`
+      );
     }
   }
 
